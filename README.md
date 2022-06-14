@@ -8,6 +8,8 @@
 - 对临时聊天不生效
 - 多个图在群聊中 > 3 图时合并发送 (不支持撤回)
 - 单个图逐个发送 (支持撤回)
+- CD 计算方式为: 设置的 CD 时间 \* 获取图片的数量
+  - 如果设置了 60s 那么，\*20 后就是 1200s = 2h
 
 ## 安装配置
 
@@ -18,8 +20,13 @@ pip install -U nonebot-plugin-setu-now
 ### .env 默认配置
 
 > 如果你不知道你要做什么 直接安装好插件 然后直接载入
+
 > 本章内容可以不看
 
+> 在吗？在读下去之前能不能告诉什么叫可选配备？
+
+是像这样写全都写上但是都留空吗？
+ 
 ```ini
 setu_cd=60
 setu_save=
@@ -36,6 +43,21 @@ setu_size=
 setu_api_url=
 setu_max=
 ```
+
+很明显不是这个意思
+
+可选的意思是像这样：
+
+```ini
+setu_cd=60
+setu_save=local
+setu_path=/data/setu
+```
+
+明白了吗？
+
+下面是配置的说明
+
 
 - `setu_cd` CD(单位秒) 可选 默认`60`秒
 - `setu_save` 保存模式 可选 `webdav`(保存到 webdav 服务器中) 或 `local`(本地) 或 留空,不保存
@@ -60,12 +82,25 @@ setu_max=
   ```
 - `setu_withdraw` 撤回发送的色图消息的时间, 单位: 秒 可选 默认`关闭` 填入数字来启用, 建议 `10` ~ `120` **仅对于非合并转发使用**
 - `setu_size` 色图质量 默认 `regular` 可选 `original` `regular` `small` `thumb` `mini`
-- setu_api_url 色图信息 api 地址 默认`https://api.lolicon.app/setu/v2` 如果有 api 符合类型也能用
+- `setu_api_url` 色图信息 api 地址 默认`https://api.lolicon.app/setu/v2` 如果有 api 符合类型也能用
 - `setu_max` 一次获取色图的数量 默认 `30` 如果你的服务器/主机内存吃紧 建议调小
-
+`
 ~~所有配置都可选了,还能出问题吗?~~
 
-### bot.py
+
+那你可以告诉我，下面这个设置出现了什么问题吗？
+
+```ini
+setu_send_custom_message_path={
+    "send": ["abc"],
+    "cd": ["cba cd: {cd_msg}"]
+  }
+setu_porxy=127.0.0。1:1234
+setu_reverse_proxy=
+setu_max=0
+```
+
+## 载入插件 bot.py
 
 ```py
 nonebot.load_plugin("nonebot_plugin_setu_now")
@@ -76,7 +111,7 @@ nonebot.load_plugin("nonebot_plugin_setu_now")
 如果你能读懂正则就不用看了
 
 ```r
-^(setu|色图|涩图|来点色色|色色|涩涩|来点色图)\s?([x]?\d+[张|个|份]?)\s?(r18)?\s?\s?(tag)?\s?(.*)?
+^(setu|色图|涩图|来点色色|色色|涩涩|来点色图)\s?([x]?\d+[张|个|份]?)?\s?(r18)?\s?\s?(tag)?\s?(.*)?
 ```
 
 - 指令 以 `setu|色图|涩图|来点色色|色色|涩涩` 为开始
